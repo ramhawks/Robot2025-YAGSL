@@ -52,29 +52,32 @@ public class Vision
   /**
    * April Tag Field Layout of the year.
    */
-  public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2025Reefscape);
+  public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
   /**
    * Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.
    */
-  private final       double              maximumAmbiguity                = 0.25;
+  private final double maximumAmbiguity = 0.25;
+
   /**
    * Photon Vision Simulation
    */
-  public              VisionSystemSim     visionSim;
+  public VisionSystemSim visionSim;
+
   /**
    * Count of times that the odom thinks we're more than 10meters away from the april tag.
    */
-  private             double              longDistangePoseEstimationCount = 0;
+  private double longDistangePoseEstimationCount = 0;
+
   /**
    * Current pose from the pose estimator using wheel odometry.
    */
-  private             Supplier<Pose2d>    currentPose;
+  private Supplier<Pose2d> currentPose;
+
   /**
    * Field from {@link swervelib.SwerveDrive#field}
    */
-  private             Field2d             field2d;
-
+  private Field2d field2d;
 
   /**
    * Constructor for the Vision class.
@@ -82,18 +85,15 @@ public class Vision
    * @param currentPose Current pose supplier, should reference {@link SwerveDrive#getPose()}
    * @param field       Current field, should be {@link SwerveDrive#field}
    */
-  public Vision(Supplier<Pose2d> currentPose, Field2d field)
-  {
+  public Vision(Supplier<Pose2d> currentPose, Field2d field) {
     this.currentPose = currentPose;
     this.field2d = field;
 
-    if (Robot.isSimulation())
-    {
+    if (Robot.isSimulation()) {
       visionSim = new VisionSystemSim("Vision");
       visionSim.addAprilTags(fieldLayout);
 
-      for (Cameras c : Cameras.values())
-      {
+      for (Cameras c : Cameras.values()) {
         c.addToVisionSim(visionSim);
       }
 
