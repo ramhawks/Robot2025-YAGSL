@@ -6,13 +6,13 @@
     "GLOBAL": {
       "font": "Proggy Dotted",
       "fps": "120",
-      "height": "845",
-      "maximized": "0",
+      "height": "562",
+      "maximized": "1",
       "style": "0",
       "userScale": "2",
-      "width": "1782",
-      "xpos": "2022",
-      "ypos": "102"
+      "width": "1187",
+      "xpos": "1920",
+      "ypos": "23"
     }
   },
   "Table": {
@@ -27,7 +27,7 @@
     "###/FMSInfo": {
       "Collapsed": "0",
       "Pos": "3,201",
-      "Size": "169,167"
+      "Size": "181,167"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
@@ -37,26 +37,26 @@
     "###FMS": {
       "Collapsed": "0",
       "Pos": "253,485",
-      "Size": "181,184"
+      "Size": "283,140"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "207,647",
+      "Pos": "207,543",
       "Size": "796,189"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
-      "Pos": "1292,188",
+      "Pos": "1168,188",
       "Size": "300,560"
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "1337,22",
+      "Pos": "1168,22",
       "Size": "440,658"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
-      "Pos": "1021,685",
+      "Pos": "1021,543",
       "Size": "750,145"
     },
     "###Other Devices": {
