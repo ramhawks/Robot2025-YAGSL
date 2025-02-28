@@ -112,6 +112,14 @@ public class RobotContainer {
     } 
     else {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      System.out.println("Robot Container: Not Simulation");
+      
+      // Map button 7 (Xbox: back) reset gyro
+      //drivebase.setDefaultCommand(drivebase.driveFieldOriented(???));
+      //driverXbox.button(7)
+
+      // Map button 8 (Xbox: start) reset gyro
+      //driverXbox.button(8)
     }
 
     if (Robot.isSimulation()) {
