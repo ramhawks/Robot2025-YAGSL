@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -37,23 +38,26 @@ public class RobotContainer {
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
+   * Transform Controller inputs into workable Chassis speeds.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream
     .of(drivebase.getSwerveDrive(),
         () -> driverXbox.getLeftY() * -1,
-        () -> driverXbox.getLeftX() * -1)
-    .withControllerRotationAxis(driverXbox::getRightX)
-    .deadband(OperatorConstants.DEADBAND)
-    .scaleTranslation(0.8)
-    .allianceRelativeControl(true);
+        () -> driverXbox.getLeftX() * -1)              // Axis which give the desired translational angle and speed.
+    .withControllerRotationAxis(driverXbox::getRightX) // Axis which give the desired angular velocity.
+    .deadband(OperatorConstants.DEADBAND)              // Controller deadband
+    .scaleTranslation(0.8)            // Scaled controller translation axis
+    .allianceRelativeControl(true);            // Alliance relative controls.
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+   * Copy the stream so further changes do not affect driveAngularVelocity
    */
   SwerveInputStream driveDirectAngle = driveAngularVelocity
       .copy()
-      .withControllerHeadingAxis(driverXbox::getRightX, driverXbox::getRightY)
-      .headingWhile(true);
+      .withControllerHeadingAxis(driverXbox::getRightX, 
+                                 driverXbox::getRightY) // Axis which give the desired heading angle using trigonometry.
+      .headingWhile(true);                 // Enable heading based control.
 
   /**
    * Clone's the angular velocity input stream and converts it to a robotRelative input stream.
@@ -115,11 +119,27 @@ public class RobotContainer {
       System.out.println("Robot Container: Not Simulation");
       
       // Map button 7 (Xbox: back) reset gyro
-      //drivebase.setDefaultCommand(drivebase.driveFieldOriented(???));
-      //driverXbox.button(7)
+      driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       // Map button 8 (Xbox: start) reset gyro
-      //driverXbox.button(8)
+      driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+
+      /*
+       * Map other buttons on the Xbox controller
+       * See CommandXboxController JavaDoc for more information.
+       * 
+       * driverXbox.a()             - get the A button binding
+       *           .onTrue(         - specify what to do when the button is pressed
+       *           new InstantCommand(() -> drivebase.zeroGyro())) - call the reset gyro method on the SwerveDrive object
+       * driverXbox.b() - get the B button binding
+       * driverXbox.x() - get the X button binding
+       * driverXbox.y() - get the Y button binding
+       * 
+       * Relavent driveBase methods?
+       * centerModulesCommand() - Returns a Command that centers the modules of the SwerveDrive subsystem.
+       * driveToDistanceCommand(double distanceInMeters, double speedInMetersPerSecond) - Returns a Command that drives the swerve drive to a specific distance at a given speed.
+       * 
+       */
     }
 
     if (Robot.isSimulation()) {

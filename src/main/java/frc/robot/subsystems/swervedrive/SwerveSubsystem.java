@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+// import other classes such as elevator and gripper
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -77,6 +78,8 @@ public class SwerveSubsystem extends SubsystemBase
    * PhotonVision class to keep an accurate odometry.
    */
   private Vision vision;
+
+  // Declare other classes such as elevator and gripper
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -146,6 +149,8 @@ public class SwerveSubsystem extends SubsystemBase
   {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
+
+  // Declare constructors for other classes such as elevator and gripper
 
   @Override
   public void periodic()
