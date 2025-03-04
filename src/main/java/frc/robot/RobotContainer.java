@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -35,6 +36,8 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+  //private final ArmSubsystem         arm              = new ArmSubsystem();
+  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -89,6 +92,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    elevator.setDefaultCommand(elevator.setElevatorHeight(0));
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -123,6 +127,7 @@ public class RobotContainer {
 
       // Map button 8 (Xbox: start) reset gyro
       driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+      driverXbox.a().onTrue(new InstantCommand(() -> elevator.setElevatorHeight(.1)));
 
       /*
        * Map other buttons on the Xbox controller
