@@ -29,15 +29,15 @@ import swervelib.SwerveInputStream;
  * Instead, the structure of the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-
+  // Controllers
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //final CommandJoystick driverJoystick = new CommandJoystick(0);
   final CommandXboxController driverXbox = new CommandXboxController(0);
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
-  //private final ArmSubsystem         arm              = new ArmSubsystem();
   private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+  //private final ArmSubsystem arm = new ArmSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -92,9 +92,12 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Set default command(s)
     elevator.setDefaultCommand(elevator.setElevatorHeight(0));
+
     // Configure the trigger bindings
     configureBindings();
+
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
   }
@@ -119,15 +122,17 @@ public class RobotContainer {
       drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
     } 
     else {
+      // teleOp mode?
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-      System.out.println("Robot Container: Not Simulation");
       
       // Map button 7 (Xbox: back) reset gyro
       driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       // Map button 8 (Xbox: start) reset gyro
       driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
-      driverXbox.a().onTrue(new InstantCommand(() -> elevator.setElevatorHeight(.1)));
+
+      // Map Xbox A button to ...?
+      driverXbox.a().onTrue(new InstantCommand(() -> elevator.setElevatorHeight(4)));
 
       /*
        * Map other buttons on the Xbox controller

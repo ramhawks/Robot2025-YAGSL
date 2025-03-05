@@ -40,36 +40,45 @@ import static edu.wpi.first.units.Units.*;
 
 public class ElevatorSubsystem extends SubsystemBase {
     //setUp
-    private final DCMotor m_elevatorGearbox = DCMotor.getNEO(1);
-    private final SparkMax m_motor = new SparkMax(12, SparkLowLevel.MotorType.kBrushless);
+    private final DCMotor m_elevatorGearbox = DCMotor.getCIM(1);
+    private final SparkMax m_motor = new SparkMax(12, SparkLowLevel.MotorType.kBrushed);
     private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_elevatorGearbox);
     private final RelativeEncoder m_encoder = m_motor.getEncoder();
-    private final ProfiledPIDController m_controller = new ProfiledPIDController(ElevatorConstants.kElevatorKp,
+    private final ProfiledPIDController m_controller = new ProfiledPIDController(
+            ElevatorConstants.kElevatorKp,
             ElevatorConstants.kElevatorKi,
             ElevatorConstants.kElevatorKd,
-            new Constraints(ElevatorConstants.kMaxVelocity,
-                    ElevatorConstants.kMaxAcceleration));
-    private final ElevatorFeedforward m_feedForward = new ElevatorFeedforward(ElevatorConstants.kElevatorkS,
+            new Constraints(
+                ElevatorConstants.kMaxVelocity,
+                ElevatorConstants.kMaxAcceleration)
+            );
+    private final ElevatorFeedforward m_feedForward = new ElevatorFeedforward(
+            ElevatorConstants.kElevatorkS,
             ElevatorConstants.kElevatorkG,
             ElevatorConstants.kElevatorkV,
             ElevatorConstants.kElevatorkA);
     private ElevatorSim m_elevatorSim = null;
+    
     // Sensors
     // private final LaserCan m_elevatorLaserCan = new LaserCan(0);
     // private final LaserCanSim m_elevatorLaserCanSim = new LaserCanSim(0);
     // private final RegionOfInterest m_laserCanROI = new RegionOfInterest(0, 0, 16, 16);
     // private final TimingBudget m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
-    private final Alert m_laserCanFailure = new Alert("LaserCAN failed to configure.",
-            AlertType.kError);
+    private final Alert m_laserCanFailure = new Alert(
+        "LaserCAN failed to configure.",
+        AlertType.kError);
     private final DigitalInput m_limitSwitchLow = new DigitalInput(9);
     private DIOSim m_limitSwitchLowSim = null;
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(40)
-                .openLoopRampRate(ElevatorConstants.kElevatorRampRate);
+            .openLoopRampRate(ElevatorConstants.kElevatorRampRate);
 
-        m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);//
+        m_motor.configure(
+            config, 
+            SparkBase.ResetMode.kNoResetSafeParameters, 
+            SparkBase.PersistMode.kPersistParameters);
 
         if (RobotBase.isSimulation()) {
             m_elevatorSim = new ElevatorSim(m_elevatorGearbox,
@@ -92,9 +101,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         } catch (Exception e) {
             m_laserCanFailure.set(true);
         }
-
     }
 
+    /*
+     * Method is called periodically by the CommandScheduler to update subsystem-specific tasks in the simulaton
+     */
     public void simulationPeriodic() {
         //set input(voltage)
         m_elevatorSim.setInput(m_motorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
@@ -102,8 +113,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         //update-every 20 milliseconds
         m_elevatorSim.update(0.02);
 
-        m_motorSim.iterate(Elevator.convertDistanceToRotations(Meters.of(m_elevatorSim.getVelocityMetersPerSecond()))
-                        .per(Second).in(RPM),
+        m_motorSim.iterate(
+                Elevator.convertDistanceToRotations(Meters.of(m_elevatorSim.getVelocityMetersPerSecond()))
+                        .per(Second)
+                        .in(RPM),
                 RoboRioSim.getVInVoltage(),
                 0.020);
 
@@ -135,28 +148,42 @@ public class ElevatorSubsystem extends SubsystemBase {
                 / ElevatorConstants.kElevatorGearing;
     }
 
+    /*
+     * 
+     */
     public void reachGoal(double goal){
+        double getControllerSetpointVelocity = m_controller.getSetpoint().velocity;
+        double feedForwardCalcWithVelocity = m_feedForward.calculateWithVelocities(
+            getVelocityMetersPerSecond(), 
+            getControllerSetpointVelocity);
+        double getNextOutputOfPID = m_controller.calculate(getPositionMeters(), goal);
         double voltsOutput = MathUtil.clamp(
-                m_feedForward.calculateWithVelocities(getVelocityMetersPerSecond(), m_controller.getSetpoint().velocity)
-                + m_controller.calculate(getPositionMeters(), goal),
-                -7,
-                7);
+            feedForwardCalcWithVelocity + getNextOutputOfPID, 
+            -7, 
+            7);
         m_motor.setVoltage(voltsOutput);
     }
 
+    /*
+     * Set voltage to a certain amount, our goal and run it for Command-based programming
+     */
     public Command setGoal(double goal){
         return run(() -> reachGoal(goal));
     }
 
+    /*
+     * Returns a setGoal. Uses a condition of around height to stop
+     * Param: height is in meters
+     */
     public Command setElevatorHeight(double height){
-        return setGoal(height).until(()->aroundHeight(height));
+        return setGoal(height).until(() -> aroundHeight(height));
     }
 
     public boolean aroundHeight(double height){
         return aroundHeight(height, ElevatorConstants.kElevatorDefaultTolerance);
     }
     public boolean aroundHeight(double height, double tolerance){
-        return MathUtil.isNear(height,getPositionMeters(),tolerance);
+        return MathUtil.isNear(height, getPositionMeters(), tolerance);
     }
 
      /**

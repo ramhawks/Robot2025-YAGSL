@@ -8,6 +8,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.RobotMath.Arm;
 import swervelib.math.Matter;
 import static edu.wpi.first.units.Units.*;
@@ -21,29 +26,53 @@ import static edu.wpi.first.units.Units.*;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  // Simulator constants
+  public static final Mechanism2d sideView = new Mechanism2d(
+                                              ArmConstants.kArmLength * 2,
+                                              ArmConstants.kArmLength + ElevatorConstants.kElevatorLength);
+  public static final MechanismRoot2d elevatorCarriage;
+  public static final MechanismLigament2d armMech;
+  public static final MechanismLigament2d elevatorMech;
+
+  // static method to initalize the values of the static vars
+  static {
+    elevatorCarriage = Constants.sideView.getRoot("Elevator Carriage",
+                                                        ArmConstants.kArmLength,
+                                                        ElevatorConstants.kElevatorStartingHeightSim.in(Meters));
+    armMech = elevatorCarriage.append(new MechanismLigament2d("Arm",
+                                                        ArmConstants.kArmLength,
+                                                        ArmConstants.kArmStartingAngle.in(Degrees),
+                                                        6,
+                                                        new Color8Bit(Color.kOrange)));
+    elevatorMech = elevatorCarriage.append(new MechanismLigament2d("Elevator",
+                                                        ElevatorConstants.kElevatorLength,
+                                                        ElevatorConstants.kElevatorStartingAngle.in(Degrees),
+                                                        6,
+                                                        new Color8Bit(Color.kRed)));
+  }
+
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
-//  public static final class AutonConstants
-//  {
-//
-//    public static final PIDConstants TRANSLATION_PID = new PIDConstants(0.7, 0, 0);
-//    public static final PIDConstants ANGLE_PID       = new PIDConstants(0.4, 0, 0.01);
-//  }
+  //  public static final class AutonConstants
+  //  {
+  //
+  //    public static final PIDConstants TRANSLATION_PID = new PIDConstants(0.7, 0, 0);
+  //    public static final PIDConstants ANGLE_PID       = new PIDConstants(0.4, 0, 0.01);
+  //  }
 
   public static final class DrivebaseConstants {
-
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
   public static final class ElevatorConstants {
-    public static final double kElevatorKp = 5;//5
+    public static final double kElevatorKp = 5; //5
     public static final double kElevatorKi = 0;
-    public static final double kElevatorKd = 0;//
+    public static final double kElevatorKd = 0; //
     public static final double kMaxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
     public static final double kMaxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
     public static final double kElevatorkS = 0.02;
