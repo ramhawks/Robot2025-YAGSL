@@ -123,6 +123,7 @@ public class RobotContainer {
     } 
     else {
       // teleOp mode?
+      
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       
       // Map button 7 (Xbox: back) reset gyro
@@ -132,7 +133,8 @@ public class RobotContainer {
       driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       // Map Xbox A button to ...?
-      driverXbox.a().onTrue(new InstantCommand(() -> elevator.setElevatorHeight(4)));
+      //driverXbox.a().onTrue(new InstantCommand(() -> elevator.setElevatorHeight(4)));
+      driverXbox.a().whileTrue(elevator.setElevatorHeight(4));
 
       /*
        * Map other buttons on the Xbox controller
@@ -167,12 +169,12 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
     } 
     else {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.b().whileTrue(drivebase
-        .driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
+      //DriverStation.isTeleop();
+      //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      //driverXbox.b().whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+      //driverXbox.start().whileTrue(Commands.none());
+      //driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
     }

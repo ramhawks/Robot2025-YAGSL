@@ -139,8 +139,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getPositionMeters() {
-        return m_encoder.getPosition() * (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius)
-                / ElevatorConstants.kElevatorGearing;
+        double elevPos = m_encoder.getPosition();
+        double circumfrence = 2 * Math.PI * ElevatorConstants.kElevatorDrumRadius;
+        //System.out.println("Elevator Position: " + elevPos);
+        return elevPos * circumfrence / ElevatorConstants.kElevatorGearing;
     }
 
     public double getVelocityMetersPerSecond() {
