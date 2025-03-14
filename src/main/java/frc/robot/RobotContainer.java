@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.GripperSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -37,7 +38,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
   private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-  //private final ArmSubsystem arm = new ArmSubsystem();
+  private final GripperSubsystem gripper = new GripperSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -94,6 +95,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Set default command(s)
     elevator.setDefaultCommand(elevator.setElevatorHeight(0));
+    // add code to set the default for the gripper
 
     // Configure the trigger bindings
     configureBindings();
@@ -122,36 +124,33 @@ public class RobotContainer {
       drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
     } 
     else {
-      // teleOp mode?
+      // Do we need to check whether we're in teleOp mode?
       
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       
-      // Map button 7 (Xbox: back) reset gyro
+      // Map the Xbox back button to reset gyro
       driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
-      // Map button 8 (Xbox: start) reset gyro
+      // Map the Xbox start button to reset gyro
       driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
-      // Map Xbox A button to ...?
-      //driverXbox.a().onTrue(new InstantCommand(() -> elevator.setElevatorHeight(4)));
+      // Map the Xbox A button to move the elevator to position 0
       driverXbox.a().whileTrue(elevator.setElevatorHeight(4));
 
-      /*
-       * Map other buttons on the Xbox controller
-       * See CommandXboxController JavaDoc for more information.
-       * 
-       * driverXbox.a()             - get the A button binding
-       *           .onTrue(         - specify what to do when the button is pressed
-       *           new InstantCommand(() -> drivebase.zeroGyro())) - call the reset gyro method on the SwerveDrive object
-       * driverXbox.b() - get the B button binding
-       * driverXbox.x() - get the X button binding
-       * driverXbox.y() - get the Y button binding
-       * 
-       * Relavent driveBase methods?
-       * centerModulesCommand() - Returns a Command that centers the modules of the SwerveDrive subsystem.
-       * driveToDistanceCommand(double distanceInMeters, double speedInMetersPerSecond) - Returns a Command that drives the swerve drive to a specific distance at a given speed.
-       * 
-       */
+      // Map the Xbox Y button to move the elevator to position 1
+      driverXbox.b().whileTrue(elevator.setElevatorHeight(4));
+
+      // Map the Xbox Y button to move the elevator to position 2
+      driverXbox.y().whileTrue(elevator.setElevatorHeight(4));
+
+      // Map the Xbox X button to ...?
+      //driverXbox.x().whileTrue(gripper.setSomething());
+
+      // Map the Xbox Left Bumper button to ...?
+      //driverXbox.leftBumper().onTrue(gripper.setSomething());
+
+      // Map the Xbox Right Bumper button to ...?
+      //driverXbox.rightBumper().onTrue(gripper.setSomething());
     }
 
     if (Robot.isSimulation()) {
@@ -168,16 +167,16 @@ public class RobotContainer {
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
     } 
-    else {
+    //else {
       //DriverStation.isTeleop();
       //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       //driverXbox.b().whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
       //driverXbox.start().whileTrue(Commands.none());
       //driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
-    }
+      //driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      //driverXbox.rightBumper().onTrue(Commands.none());
+    //}
   }
 
   /**
