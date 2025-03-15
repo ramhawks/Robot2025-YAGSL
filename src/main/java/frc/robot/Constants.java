@@ -70,6 +70,7 @@ public final class Constants {
   }
 
   public static final class ElevatorConstants {
+    public static final int kElevatorMotorID = 12;
     public static final double kElevatorKp = 5; //5
     public static final double kElevatorKi = 0;
     public static final double kElevatorKd = 0; //
@@ -80,6 +81,7 @@ public final class Constants {
     public static final double kElevatorkV = 3.8;
     public static final double kElevatorkA = 0.17;
     public static final double kElevatorRampRate = 0.1;
+    // TO DO: update gear ratio
     public static final double kElevatorGearing = 1; //12.0
     public static final double kElevatorCarriageMass = 4.0;
     public static final double kElevatorDrumRadius = Units.inchesToMeters(1.0); // 2
@@ -94,7 +96,9 @@ public final class Constants {
   }
 
   public static class ArmConstants {
-    public static final int armMotorID = 15;
+    public static final int kArmMotorID = 15;
+    // TO DO: update arm gear ratio
+    public static final double kArmGearing = 12.8;
     public static final double kArmkS = 0;    // Volts (V)
     public static final double kArmkG = 1.53; // Volts (V)
     public static final double kArmkV = 1.58; // Volts Per Velocity (V/(rad/s))
@@ -113,8 +117,8 @@ public final class Constants {
     public static final double kArmAllowedClosedLoopError = Arm.convertArmAngleToSensorUnits(Degrees.of(0.01)).in(Rotations);
     public static final double kArmLength = Inches.of(31).in(Meters);
     public static final double kArmMass = 8.0; // kg//?
-    public static final Angle kArmMinAngle = Degrees.of(-90);
-    public static final Angle kArmMaxAngle = Degrees.of(255);//?
+    public static final double kArmMinAngle = -90; //Degrees.of(-90);
+    public static final double kArmMaxAngle = 255; //Degrees.of(255);//?
     public static final Angle kArmStartingAngle = Degrees.of(0);
     public static final Angle kArmOffsetToHorizontalZero = Rotations.of(0);
     public static final double kArmDefaultTolerance = 1;
