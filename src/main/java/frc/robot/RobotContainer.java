@@ -38,7 +38,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
   private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-  private final ArmSubsystem gripper = new ArmSubsystem();
+  private final ArmSubsystem arm = new ArmSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -135,22 +135,22 @@ public class RobotContainer {
       driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       // Map the Xbox A button to move the elevator to position 0
-      driverXbox.a().whileTrue(elevator.setElevatorHeight(4));
+      driverXbox.a().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionOne));
 
       // Map the Xbox Y button to move the elevator to position 1
-      driverXbox.b().whileTrue(elevator.setElevatorHeight(4));
+      driverXbox.b().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionOne));
 
       // Map the Xbox Y button to move the elevator to position 2
-      driverXbox.y().whileTrue(elevator.setElevatorHeight(4));
+      driverXbox.y().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionTwo));
 
       // Map the Xbox X button to ...?
       //driverXbox.x().whileTrue(gripper.setSomething());
 
-      // Map the Xbox Left Bumper button to ...?
-      //driverXbox.leftBumper().onTrue(gripper.setSomething());
+      // Map the Xbox Left Bumper button to set the Arm to position 0
+      driverXbox.leftBumper().onTrue(arm.setPosition(Constants.ArmConstants.kArmPostionOpen));
 
-      // Map the Xbox Right Bumper button to ...?
-      //driverXbox.rightBumper().onTrue(gripper.setSomething());
+      // Map the Xbox Right Bumper button to set the Arm to position 1
+      driverXbox.rightBumper().onTrue(arm.setPosition(Constants.ArmConstants.kArmPostionClose));
     }
 
     if (Robot.isSimulation()) {

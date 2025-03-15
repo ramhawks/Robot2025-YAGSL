@@ -93,6 +93,9 @@ public final class Constants {
     public static final Distance kLaserCANOffset          = Inches.of(3);
     public static final double kElevatorDefaultTolerance = Inches.of(0.1).in(Meters); // 1
     public static double kLowerToScoreHeight =  Units.inchesToMeters(6);
+    public static final double kElevatorPostionZero = 0;
+    public static final double kElevatorPostionOne = 1;
+    public static final double kElevatorPostionTwo = 2;
   }
 
   public static class ArmConstants {
@@ -122,6 +125,8 @@ public final class Constants {
     public static final Angle kArmStartingAngle = Degrees.of(0);
     public static final Angle kArmOffsetToHorizontalZero = Rotations.of(0);
     public static final double kArmDefaultTolerance = 1;
+    public static final double kArmPostionOpen = 0;
+    public static final double kArmPostionClose = 1;
   }
 
   public static class OperatorConstants {
