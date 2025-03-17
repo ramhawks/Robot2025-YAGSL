@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
+import com.revrobotics.spark.SparkLimitSwitch;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 import edu. wpi. first. math. trajectory. TrapezoidProfile.Constraints;
@@ -65,9 +68,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DigitalInput m_limitSwitchLow = new DigitalInput(9);
     private DIOSim m_limitSwitchLowSim = null;
 
+    private boolean m_isHomed = false;
+
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(40).openLoopRampRate(ElevatorConstants.kElevatorRampRate);
+        
+        // Configure reverse limit switch (homing position)
+        config.limitSwitch.reverseLimitSwitchEnabled(true);
+        config.limitSwitch.reverseLimitSwitchType(Type.kNormallyOpen);
+
         m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 
         if (RobotBase.isSimulation()) {
@@ -91,6 +101,20 @@ public class ElevatorSubsystem extends SubsystemBase {
         } catch (Exception e) {
             m_laserCanFailure.set(true);
         }
+    }
+
+    // Homing command
+    public Command homeElevator() {
+        return Commands.runOnce(() -> {
+            // Move down until limit switch triggers
+            m_motor.set(-0.2);
+            }).until(() -> m_motor.getReverseLimitSwitch().isPressed())
+            .andThen(() -> {
+              m_motor.stopMotor();
+              m_motor.getEncoder().setPosition(0);
+              m_isHomed = true;
+          }
+        );
     }
 
     /*
