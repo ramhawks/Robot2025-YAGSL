@@ -99,7 +99,7 @@ public final class Constants {
   }
 
   public static class ArmConstants {
-    public static final int kArmMotorID = 15;
+    public static final int kArmMotorID = 17;
     // TO DO: update arm gear ratio
     public static final double kArmGearing = 12.8;
     public static final double kArmkS = 0;    // Volts (V)
@@ -132,9 +132,9 @@ public final class Constants {
 
   public static class OperatorConstants {
     // Joystick Deadband
-    public static final double DEADBAND        = 0.1;
-    public static final double LEFT_Y_DEADBAND = 0.1;
-    public static final double RIGHT_X_DEADBAND = 0.1;
+    public static final double DEADBAND        = 0.25;
+    public static final double LEFT_Y_DEADBAND = 0.25;
+    public static final double RIGHT_X_DEADBAND = 0.25;
     public static final double TURN_CONSTANT    = 6;
   }
 }
