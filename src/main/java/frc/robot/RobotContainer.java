@@ -131,20 +131,20 @@ public class RobotContainer {
       // Map the Xbox back button to reset gyro
       driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
-      // Map the Xbox start button to reset gyro
-      driverXbox.start().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+      // Map the Xbox start button to reset gripper arm
+      driverXbox.start().onTrue(new InstantCommand(() -> arm.resetArm()));
 
-      // Map the Xbox A button to move the elevator to position 0
+      // Map the Xbox Y button to ...?
+      //driverXbox.y().onTrue();
+
+      // Map the Xbox X button to move the elevator to position 0
+      driverXbox.x().onTrue(elevator.homeElevator());
+
+      // Map the Xbox A button to move the elevator to position 1
       driverXbox.a().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionOne));
 
-      // Map the Xbox Y button to move the elevator to position 1
-      driverXbox.b().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionOne));
-
-      // Map the Xbox Y button to move the elevator to position 2
-      driverXbox.y().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionTwo));
-
-      // Map the Xbox X button to ...?
-      //driverXbox.x().whileTrue(gripper.setSomething());
+      // Map the Xbox B button to move the elevator to position 2
+      driverXbox.b().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionTwo));
 
       // Map the Xbox Left Bumper button to set the Arm to position 0
       driverXbox.leftBumper().onTrue(arm.setPosition(Constants.ArmConstants.kArmPostionOpen));

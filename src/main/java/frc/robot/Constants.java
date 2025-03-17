@@ -109,6 +109,7 @@ public final class Constants {
     public static final double kArmkP = 0.5;  //?
     public static final double kArmkI = 0.0;
     public static final double kArmkD = 0.0;
+    public static final double kArmkGrav = 0.5;
     public static final double kArmReduction = 81;
     public static final double kArmMaxVelocity = Arm.convertArmAngleToSensorUnits(Degrees.of(90))//?
                                                 .per(Second).in(RPM) ;
@@ -120,13 +121,13 @@ public final class Constants {
     public static final double kArmAllowedClosedLoopError = Arm.convertArmAngleToSensorUnits(Degrees.of(0.01)).in(Rotations);
     public static final double kArmLength = Inches.of(31).in(Meters);
     public static final double kArmMass = 8.0; // kg//?
-    public static final double kArmMinAngle = -90; //Degrees.of(-90);
-    public static final double kArmMaxAngle = 255; //Degrees.of(255);//?
+    public static final double kArmMinAngle = 0; //Degrees.of(-90);
+    public static final double kArmMaxAngle = -150; //Degrees.of(255);//?
     public static final Angle kArmStartingAngle = Degrees.of(0);
     public static final Angle kArmOffsetToHorizontalZero = Rotations.of(0);
     public static final double kArmDefaultTolerance = 1;
-    public static final double kArmPostionOpen = 0;
-    public static final double kArmPostionClose = 1;
+    public static final double kArmPostionOpen = 210;
+    public static final double kArmPostionClose = 270;
   }
 
   public static class OperatorConstants {
