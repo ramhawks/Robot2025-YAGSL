@@ -66,7 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final Alert m_laserCanFailure = new Alert(
         "LaserCAN failed to configure.",
         AlertType.kError);
-    private final DigitalInput m_limitSwitchLow = new DigitalInput(0);
+    private final DigitalInput m_limitSwitchLow = new DigitalInput(2);
     private final DigitalInput topLimitSwitch = new DigitalInput(1);
     private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
     private DIOSim m_limitSwitchLowSim = null;
@@ -197,6 +197,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Param: height is in meters
      */
     public Command setElevatorHeight(double height){
+        
         return setGoal(height).until(() -> aroundHeight(height));
     }
 

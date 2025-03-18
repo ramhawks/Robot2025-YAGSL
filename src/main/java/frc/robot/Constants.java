@@ -81,12 +81,11 @@ public final class Constants {
     public static final double kElevatorkV = 3.8;
     public static final double kElevatorkA = 0.17;
     public static final double kElevatorRampRate = 0.1;
-    // TO DO: update gear ratio
-    public static final double kElevatorGearing = 4; //12.0
+    public static final double kElevatorGearing = 4;
     public static final double kElevatorCarriageMass = 4.0;
     public static final double kElevatorDrumRadius = Units.inchesToMeters(1.0); // 2
     public static final double kElevatorMinHeightMeters = 0.0;
-    public static final double kElevatorMaxHeightMeters = 10.25;
+    public static final double kElevatorMaxHeightMeters = 0.9;
     public static final double kElevatorLength = Inches.of(33).in(Meters);
     public static final Distance kElevatorStartingHeightSim = Meters.of(0.0);
     public static final Angle kElevatorStartingAngle = Degrees.of(-90);
@@ -94,7 +93,7 @@ public final class Constants {
     public static final double kElevatorDefaultTolerance = Inches.of(0.1).in(Meters); // 1
     public static double kLowerToScoreHeight =  Units.inchesToMeters(6);
     public static final double kElevatorPostionZero = 0;
-    public static final double kElevatorPostionOne = 1;
+    public static final double kElevatorPostionOne = 200;
     public static final double kElevatorPostionTwo = 2;
   }
 
