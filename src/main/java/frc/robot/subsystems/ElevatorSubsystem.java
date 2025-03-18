@@ -11,6 +11,7 @@ import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 import com.revrobotics.spark.SparkLimitSwitch;
@@ -65,20 +66,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final Alert m_laserCanFailure = new Alert(
         "LaserCAN failed to configure.",
         AlertType.kError);
-    private final DigitalInput m_limitSwitchLow = new DigitalInput(9);
+    private final DigitalInput m_limitSwitchLow = new DigitalInput(0);
+    private final DigitalInput topLimitSwitch = new DigitalInput(1);
+    private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
     private DIOSim m_limitSwitchLowSim = null;
-
     private boolean m_isHomed = false;
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(40).openLoopRampRate(ElevatorConstants.kElevatorRampRate);
         
-        // Configure reverse limit switch (homing position)
-        config.limitSwitch.reverseLimitSwitchEnabled(true);
-        config.limitSwitch.reverseLimitSwitchType(Type.kNormallyOpen);
+        // Configure reverse limit switch (homing position)        
+        //config.limitSwitch.reverseLimitSwitchEnabled(true);
+        //config.limitSwitch.reverseLimitSwitchType(Type.kNormallyOpen);
 
         m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+
+        
 
         if (RobotBase.isSimulation()) {
             m_elevatorSim = new ElevatorSim(m_elevatorGearbox,
@@ -105,10 +109,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // Homing command
     public Command homeElevator() {
+
         return Commands.runOnce(() -> {
             // Move down until limit switch triggers
             m_motor.set(-0.2);
-            }).until(() -> m_motor.getReverseLimitSwitch().isPressed())
+            }).until(() -> bottomLimitSwitch.get()) //m_motor.getReverseLimitSwitch().isPressed()
             .andThen(() -> {
               m_motor.stopMotor();
               m_motor.getEncoder().setPosition(0);

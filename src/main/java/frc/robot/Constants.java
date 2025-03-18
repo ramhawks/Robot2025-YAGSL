@@ -82,7 +82,7 @@ public final class Constants {
     public static final double kElevatorkA = 0.17;
     public static final double kElevatorRampRate = 0.1;
     // TO DO: update gear ratio
-    public static final double kElevatorGearing = 1; //12.0
+    public static final double kElevatorGearing = 4; //12.0
     public static final double kElevatorCarriageMass = 4.0;
     public static final double kElevatorDrumRadius = Units.inchesToMeters(1.0); // 2
     public static final double kElevatorMinHeightMeters = 0.0;
@@ -101,7 +101,7 @@ public final class Constants {
   public static class ArmConstants {
     public static final int kArmMotorID = 17;
     // TO DO: update arm gear ratio
-    public static final double kArmGearing = 12.8;
+    public static final double kArmGearing = 100;
     public static final double kArmkS = 0;    // Volts (V)
     public static final double kArmkG = 1.53; // Volts (V)
     public static final double kArmkV = 1.58; // Volts Per Velocity (V/(rad/s))
