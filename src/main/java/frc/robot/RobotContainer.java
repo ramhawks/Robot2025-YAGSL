@@ -95,7 +95,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Set default command(s)
     elevator.setDefaultCommand(elevator.setElevatorHeight(0));
-    // add code to set the default for the gripper
+    arm.setDefaultCommand(arm.resetArm());
 
     // Configure the trigger bindings
     configureBindings();
