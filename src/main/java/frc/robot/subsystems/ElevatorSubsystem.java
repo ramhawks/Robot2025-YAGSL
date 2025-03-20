@@ -63,9 +63,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // private final LaserCanSim m_elevatorLaserCanSim = new LaserCanSim(0);
     // private final RegionOfInterest m_laserCanROI = new RegionOfInterest(0, 0, 16, 16);
     // private final TimingBudget m_laserCanTimingBudget = TimingBudget.TIMING_BUDGET_20MS;
-    private final Alert m_laserCanFailure = new Alert(
-        "LaserCAN failed to configure.",
-        AlertType.kError);
+    private final Alert m_laserCanFailure = new Alert("LaserCAN failed to configure.", AlertType.kError);
     private final DigitalInput m_limitSwitchLow = new DigitalInput(2);
     private final DigitalInput topLimitSwitch = new DigitalInput(1);
     private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
@@ -73,16 +71,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private boolean m_isHomed = false;
 
     public ElevatorSubsystem() {
+        // Reset controller with initial position
+        resetController();
+
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(40).openLoopRampRate(ElevatorConstants.kElevatorRampRate);
-        
-        // Configure reverse limit switch (homing position)        
-        //config.limitSwitch.reverseLimitSwitchEnabled(true);
-        //config.limitSwitch.reverseLimitSwitchType(Type.kNormallyOpen);
-
         m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-
-        
 
         if (RobotBase.isSimulation()) {
             m_elevatorSim = new ElevatorSim(m_elevatorGearbox,
@@ -107,10 +101,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
+    private void resetController() {
+        m_controller.reset(m_encoder.getPosition(), m_encoder.getVelocity());
+    }
+
     // Homing command
     public Command homeElevator() {
 
         return Commands.runOnce(() -> {
+            // Reset the controller before going to a new goal. Do we need to do this? 
+            resetController();
             // Move down until limit switch triggers
             m_motor.set(-0.2);
             }).until(() -> bottomLimitSwitch.get()) //m_motor.getReverseLimitSwitch().isPressed()
@@ -160,7 +160,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double getPositionMeters() {
         double elevPos = m_encoder.getPosition();
         double circumfrence = 2 * Math.PI * ElevatorConstants.kElevatorDrumRadius;
-        //System.out.println("Elevator Position: " + elevPos);
         return elevPos * circumfrence / ElevatorConstants.kElevatorGearing;
     }
 
@@ -169,9 +168,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 / ElevatorConstants.kElevatorGearing;
     }
 
-    /*
-     * 
-     */
     public void reachGoal(double goal){
         double getControllerSetpointVelocity = m_controller.getSetpoint().velocity;
         double feedForwardCalcWithVelocity = m_feedForward.calculateWithVelocities(
@@ -197,7 +193,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Param: height is in meters
      */
     public Command setElevatorHeight(double height){
-        
+        resetController();
         return setGoal(height).until(() -> aroundHeight(height));
     }
 
@@ -211,20 +207,17 @@ public class ElevatorSubsystem extends SubsystemBase {
      /**
      * Stop the control loop and motor output.
      */
-    public void stop()
-    {
+    public void stop() {
         m_motor.set(0.0);
     }
 
     /**
      * Update telemetry, including the mechanism visualization.
      */
-    public void updateTelemetry()
-    {
+    public void updateTelemetry() {
     }
 
     @Override
-    public void periodic()
-    {
+    public void periodic() {
     }
 }
