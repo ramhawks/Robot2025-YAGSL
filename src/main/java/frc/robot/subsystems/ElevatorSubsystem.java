@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 import com.revrobotics.spark.SparkLimitSwitch;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -34,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
-import edu. wpi. first. math. trajectory. TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.RobotMath.Elevator;
 
 //import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
@@ -69,13 +70,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
     private DIOSim m_limitSwitchLowSim = null;
     private boolean m_isHomed = false;
+    private final double circumference = 2 * Math.PI * ElevatorConstants.kElevatorDrumRadius;
 
     public ElevatorSubsystem() {
         // Reset controller with initial position
         resetController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(40).openLoopRampRate(ElevatorConstants.kElevatorRampRate);
+        config.smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
+            .closedLoopRampRate(ElevatorConstants.kElevatorRampRate).closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .outputRange(-1, 1);
+            //.openLoopRampRate(ElevatorConstants.kElevatorRampRate);
+
         m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 
         if (RobotBase.isSimulation()) {
@@ -103,11 +110,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private void resetController() {
         m_controller.reset(m_encoder.getPosition(), m_encoder.getVelocity());
+        SmartDashboard.putString("Reset Controller", "True");
     }
 
     // Homing command
     public Command homeElevator() {
-
+        SmartDashboard.putBoolean("Home Elevator", m_isHomed);
         return Commands.runOnce(() -> {
             // Reset the controller before going to a new goal. Do we need to do this? 
             resetController();
@@ -118,7 +126,8 @@ public class ElevatorSubsystem extends SubsystemBase {
               m_motor.stopMotor();
               m_motor.getEncoder().setPosition(0);
               m_isHomed = true;
-          }
+              SmartDashboard.putBoolean("Home Elevator", m_isHomed);
+          }          
         );
     }
 
@@ -158,14 +167,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getPositionMeters() {
-        double elevPos = m_encoder.getPosition();
-        double circumfrence = 2 * Math.PI * ElevatorConstants.kElevatorDrumRadius;
-        return elevPos * circumfrence / ElevatorConstants.kElevatorGearing;
+        return (m_encoder.getPosition() / ElevatorConstants.kElevatorGearing) * circumference;
     }
 
     public double getVelocityMetersPerSecond() {
-        return (m_encoder.getVelocity() / 60) * (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius)
-                / ElevatorConstants.kElevatorGearing;
+        return ((m_encoder.getVelocity() / 60) / ElevatorConstants.kElevatorGearing) * circumference;
     }
 
     public void reachGoal(double goal){
@@ -174,6 +180,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             getVelocityMetersPerSecond(), 
             getControllerSetpointVelocity);
         double getNextOutputOfPID = m_controller.calculate(getPositionMeters(), goal);
+
         double voltsOutput = MathUtil.clamp(
             feedForwardCalcWithVelocity + getNextOutputOfPID, 
             -7, 
@@ -185,7 +192,10 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Set voltage to a certain amount, our goal and run it for Command-based programming
      */
     public Command setGoal(double goal){
-        return run(() -> reachGoal(goal));
+        return run(() -> {
+            reachGoal(goal);
+            SmartDashboard.putBoolean("Elevator Height Reached", true);
+        });
     }
 
     /*
@@ -193,6 +203,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Param: height is in meters
      */
     public Command setElevatorHeight(double height){
+        SmartDashboard.getNumber("Set Elevator Height", height);
         resetController();
         return setGoal(height).until(() -> aroundHeight(height));
     }
