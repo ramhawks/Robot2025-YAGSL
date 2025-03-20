@@ -91,7 +91,7 @@ public final class Constants {
     public static final Angle kElevatorStartingAngle = Degrees.of(-90);
     public static final Distance kLaserCANOffset          = Inches.of(3);
     public static final double kElevatorDefaultTolerance = Inches.of(0.1).in(Meters); // 1
-    public static double kLowerToScoreHeight =  Units.inchesToMeters(6);
+    public static final double kLowerToScoreHeight =  Units.inchesToMeters(6);
     public static final double kElevatorPostionZero = 0;
     public static final double kElevatorPostionOne = 200;
     public static final double kElevatorPostionTwo = 2;
@@ -99,7 +99,6 @@ public final class Constants {
 
   public static class ArmConstants {
     public static final int kArmMotorID = 17;
-    // TO DO: update arm gear ratio
     public static final double kArmGearing = 100;
     public static final double kArmkS = 0;    // Volts (V)
     public static final double kArmkG = 1.53; // Volts (V)
