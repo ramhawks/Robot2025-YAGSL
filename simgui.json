@@ -1,6 +1,11 @@
 {
   "HALProvider": {
     "Other Devices": {
+      "SPARK MAX [12]": {
+        "header": {
+          "open": true
+        }
+      },
       "Talon FX (v6)[2]/Rotor Sensor": {
         "header": {
           "open": true
@@ -41,12 +46,14 @@
       "/LiveWindow/Ungrouped/Pigeon 2 [13]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Elevator Low limit Switch": "Digital Input",
       "/SmartDashboard/Encoders": "Alerts",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/IMU": "Alerts",
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Motors": "Alerts",
       "/SmartDashboard/Pigeon 2 (v6) [13]": "Gyro",
+      "/SmartDashboard/Pigeon 2 (v6) [18]": "Gyro",
       "/SmartDashboard/Pigeon 2 [13]": "Gyro",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Swerve Drive": "Alerts",
@@ -100,10 +107,10 @@
     }
   },
   "NetworkTables": {
-    "Retained Values": {
+    "Persistent Values": {
       "open": false
     },
-    "Transitory Values": {
+    "Retained Values": {
       "open": false
     },
     "transitory": {
@@ -111,10 +118,7 @@
         "Field": {
           "open": true
         },
-        "open": true,
-        "swerve": {
-          "open": true
-        }
+        "open": true
       }
     }
   },

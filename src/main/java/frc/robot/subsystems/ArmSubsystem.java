@@ -16,6 +16,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ArmSubsystem extends SubsystemBase {
     private final SparkMax m_motor;
@@ -58,10 +59,12 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command setPosition(double position) {
+        SmartDashboard.putNumber("Set Arm Position: ", position);
         return run(() -> setAngle(position));
     }
 
     public void setAngle(double targetDegrees) {
+        SmartDashboard.putNumber("Set Arm Angle", targetDegrees);
         double currentPosition = m_encoder.getPosition();
         double pidOutput = m_pidController.calculate(currentPosition, targetDegrees);
         double feedforwardOutput = m_feedforward.calculate(
@@ -76,8 +79,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_encoder.setPosition(0);
     }
 
-    public void resetArm() {
-
+    public Command resetArm() {
+        return run(() -> setAngle(MIN_ANGLE));
     }
 
     public double getCurrentAngle() {
