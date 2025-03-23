@@ -34,11 +34,10 @@ import swervelib.SwerveInputStream;
  */
 public class RobotContainer {
   // Controllers
-  // Replace with CommandPS4Controller or CommandJoystick if needed
   //final CommandJoystick driverJoystick = new CommandJoystick(0);
   final CommandXboxController driverXbox = new CommandXboxController(0);
 
-  // The robot's subsystems and commands are defined here...
+  // The robot's subsystems are defined here
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
   //private final ElevatorSubsystem elevator = new ElevatorSubsystem();
   //private final ArmSubsystem arm = new ArmSubsystem();
@@ -97,7 +96,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Set default command(s)
-    //elevator.setDefaultCommand(elevator.setElevatorHeight(0));
+    // elevator.setDefaultCommand(elevator.setElevatorHeight(0));
     // arm.setDefaultCommand(arm.resetArm());
 
     // Configure the trigger bindings
@@ -126,11 +125,12 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
     } 
-    else {
-      // Do we need to check whether we're in teleOp mode?
-      
+    else {      
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       
+      /* 
+       * Map Xbox buttons 
+       */ 
       // Map the Xbox back button to reset gyro
       driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
@@ -138,28 +138,33 @@ public class RobotContainer {
       // driverXbox.start().onTrue(new InstantCommand(() -> arm.resetArm()));
 
       // Map the Xbox Y button to ...?
-      //driverXbox.y().onTrue();
+      // driverXbox.y().onTrue();
 
       // Map the Xbox X button to move the elevator to position 0
-      //driverXbox.x().onTrue(elevator.setGoal(0));
+      // driverXbox.x().onTrue(elevator.setGoal(0));
 
       // Map the Xbox A button to move the elevator to position 1
-      //driverXbox.a().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionOne));
-      //driverXbox.a().onTrue(elevator.driveUp());
-      ///driverXbox.a().onFalse(elevator.stop());
+      // driverXbox.a().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionOne));
+      // driverXbox.a().onTrue(elevator.driveUp());
+      // driverXbox.a().onFalse(elevator.stop());
 
       // Map the Xbox B button to move the elevator to position 2
       // driverXbox.b().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionTwo));
-      //driverXbox.b().onTrue(elevator.driveDown());
-      //driverXbox.b().onFalse(elevator.stop());
+      // driverXbox.b().onTrue(elevator.driveDown());
+      // driverXbox.b().onFalse(elevator.stop());
 
       // Map the Xbox Left Bumper button to set the Arm to position 0
-      //driverXbox.leftBumper().onTrue(arm.rotateDown());
-      //driverXbox.leftBumper().onFalse(arm.stop());
+      // driverXbox.leftBumper().onTrue(arm.rotateDown());
+      // driverXbox.leftBumper().onFalse(arm.stop());
 
       // Map the Xbox Right Bumper button to set the Arm to position 1
-      //driverXbox.rightBumper().onTrue(arm.rotateUp());
-      //driverXbox.rightBumper().onFalse(arm.stop());
+      // driverXbox.rightBumper().onTrue(arm.rotateUp());
+      // driverXbox.rightBumper().onFalse(arm.stop());
+
+      /*
+       * Map Joystick buttons
+       */
+      
     }
 
     if (Robot.isSimulation()) {
@@ -194,7 +199,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+    // Commands to run in autonomous mode
     return new ParallelRaceGroup(
       drivebase.run(()-> {
         drivebase.setChassisSpeeds(new ChassisSpeeds(1, 0, 0));

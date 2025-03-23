@@ -49,13 +49,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     //setUp
     private final DCMotor m_elevatorGearbox = DCMotor.getCIM(1);
     private SparkMax m_motor = new SparkMax(ElevatorConstants.kElevatorMotorID, SparkLowLevel.MotorType.kBrushed);
-    private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_elevatorGearbox);
     private final RelativeEncoder m_encoder = m_motor.getEncoder(); // not tracked b/c brushed motor
     private final PIDController m_controller = new PIDController(
             ElevatorConstants.kElevatorKp,
             ElevatorConstants.kElevatorKi,
             ElevatorConstants.kElevatorKd);
-   
+
+    private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_elevatorGearbox);
     private ElevatorSim m_elevatorSim = null;
     
     // Sensors
@@ -67,15 +67,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DigitalInput m_limitSwitchLow = new DigitalInput(2);
     private final DigitalInput topLimitSwitch = new DigitalInput(1);
     private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
-    private DIOSim m_limitSwitchLowSim = null;
     private boolean m_isHomed = false;
     private final double circumference = 2 * Math.PI * ElevatorConstants.kElevatorDrumRadius;
+
+    private double overridespeed = 0;
+    private boolean overridePid = false;
 
     public ElevatorSubsystem() {
         // Reset controller with initial position
         resetController();
      
-
         //SparkMaxConfig config = new SparkMaxConfig();
         //config.smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
           //  .closedLoopRampRate(ElevatorConstants.kElevatorRampRate).closedLoop
@@ -95,8 +96,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                     0.0,
                     0.02,
                     0.0);
-
-            m_limitSwitchLowSim = new DIOSim(m_limitSwitchLow);//
             SmartDashboard.putData("Elevator Low limit Switch", m_limitSwitchLow);
         }
 
@@ -106,7 +105,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             m_laserCanFailure.set(true);
         }
     }
-
 
     private void resetController() {
        // m_controller.reset(m_encoder.getPosition(), m_encoder.getVelocity());
@@ -239,8 +237,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             overridePid = true;
         });
     }
-    private double overridespeed = 0;
-    private boolean overridePid = false;
+    
     /**
      * Update telemetry, including the mechanism visualization.
      */
@@ -251,16 +248,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         System.out.println("up: " + topLimitSwitch.get() + " down: " + bottomLimitSwitch.get());
         double speed = m_controller.calculate(getPositionMeters());
-        if(overridePid){
+        
+        if(overridePid)
             speed = overridespeed;
-        }
-        if(topLimitSwitch.get() && speed >0){
-            speed = 0;
-        }
 
-        if(bottomLimitSwitch.get() && speed < 0){
+        if(topLimitSwitch.get() && speed >0)
             speed = 0;
-        }
+
+        if(bottomLimitSwitch.get() && speed < 0)
+            speed = 0;
+            
         System.out.println("Speed: " +speed);
         m_motor.set(speed);
     }

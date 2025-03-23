@@ -31,15 +31,17 @@ public class ArmSubsystem extends SubsystemBase {
         new TrapezoidProfile.Constraints(
             ArmConstants.kArmMaxAcceleration,
             ArmConstants.kArmMaxVelocity));
+
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, ArmConstants.kArmkGrav, 0);
 
     // Arm parameters
     private static final double MIN_ANGLE = ArmConstants.kArmMinAngle; // Degrees
     private static final double MAX_ANGLE = ArmConstants.kArmMaxAngle; // Degrees
+
+    double speed = 0;
     
     public ArmSubsystem() {
         m_motor = new SparkMax(ArmConstants.kArmMotorID, SparkLowLevel.MotorType.kBrushless);
-
         m_config = new SparkMaxConfig();        
         
         // Set soft limits
@@ -88,7 +90,7 @@ public class ArmSubsystem extends SubsystemBase {
     public double getCurrentAngle() {
         return m_motor.getEncoder().getPosition();
     }
-    double speed = 0;
+
     public Command stop() {
         return runOnce(() -> {
             m_motor.set(0.0);
@@ -98,7 +100,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command rotateUp(){
         return runOnce(() -> {
-            speed = 0.2;        });
+            speed = 0.2;
+        });
     }
 
     public Command rotateDown(){
@@ -116,13 +119,13 @@ public class ArmSubsystem extends SubsystemBase {
         // if(currentAngle >= MAX_ANGLE || currentAngle <= MIN_ANGLE) {
         //     stop();
         // }
-        if(getCurrentAngle() <-130 && speed < 0){
-            speed = 0;
-        }
 
-        if(getCurrentAngle() >-10 && speed > 0){
+        if(getCurrentAngle() <-130 && speed < 0)
             speed = 0;
-        }
+
+        if(getCurrentAngle() >-10 && speed > 0)
+            speed = 0;
+
         System.out.println("Arm Speed: " +speed);
         m_motor.set(speed);
     }
