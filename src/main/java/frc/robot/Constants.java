@@ -72,10 +72,10 @@ public final class Constants {
   public static final class ElevatorConstants {
     public static final int kElevatorMotorID = 12;
     public static final int kElevatorCurrentLimit = 40;
-    public static final double kElevatorKp = 5;
+    public static final double kElevatorKp = .0004;
     public static final double kElevatorKi = 0;
     public static final double kElevatorKd = 0;
-    public static final double kMaxVelocity = Meters.of(4).per(Second).in(MetersPerSecond);
+    public static final double kMaxVelocity = 1;
     public static final double kMaxAcceleration = Meters.of(8).per(Second).per(Second).in(MetersPerSecondPerSecond);
     public static final double kElevatorkS = 0.02;
     public static final double kElevatorkG = 0.9;
@@ -89,14 +89,10 @@ public final class Constants {
     public static final double kElevatorMaxHeightMeters = 0.9;
     public static final double kElevatorLength = Inches.of(33).in(Meters);
     public static final double kElevatorDefaultTolerance = Inches.of(0.1).in(Meters); // 1
-<<<<<<< HEAD
-    public static final double kLowerToScoreHeight =  Units.inchesToMeters(6);
-=======
     public static final double kLowerToScoreHeight = Units.inchesToMeters(6);
->>>>>>> 1e42807398fff46a4f662a0dccc2ebab707609eb
     public static final double kElevatorPostionZero = 0;
     public static final double kElevatorPostionOne = 200;
-    public static final double kElevatorPostionTwo = 2;
+    public static final double kElevatorPostionTwo = 400;
     public static final Distance kElevatorStartingHeightSim = Meters.of(0.0);
     public static final Angle kElevatorStartingAngle = Degrees.of(-90);
     public static final Distance kLaserCANOffset = Inches.of(3);

@@ -8,12 +8,15 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -37,8 +40,8 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
-  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-  private final ArmSubsystem arm = new ArmSubsystem();
+  //private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+  //private final ArmSubsystem arm = new ArmSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -94,8 +97,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Set default command(s)
-    elevator.setDefaultCommand(elevator.setElevatorHeight(0));
-    arm.setDefaultCommand(arm.resetArm());
+    //elevator.setDefaultCommand(elevator.setElevatorHeight(0));
+    // arm.setDefaultCommand(arm.resetArm());
 
     // Configure the trigger bindings
     configureBindings();
@@ -132,25 +135,31 @@ public class RobotContainer {
       driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
       // Map the Xbox start button to reset gripper arm
-      driverXbox.start().onTrue(new InstantCommand(() -> arm.resetArm()));
+      // driverXbox.start().onTrue(new InstantCommand(() -> arm.resetArm()));
 
       // Map the Xbox Y button to ...?
       //driverXbox.y().onTrue();
 
       // Map the Xbox X button to move the elevator to position 0
-      driverXbox.x().onTrue(elevator.homeElevator());
+      //driverXbox.x().onTrue(elevator.setGoal(0));
 
       // Map the Xbox A button to move the elevator to position 1
-      driverXbox.a().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionOne));
+      //driverXbox.a().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionOne));
+      //driverXbox.a().onTrue(elevator.driveUp());
+      ///driverXbox.a().onFalse(elevator.stop());
 
       // Map the Xbox B button to move the elevator to position 2
-      driverXbox.b().onTrue(elevator.setElevatorHeight(Constants.ElevatorConstants.kElevatorPostionTwo));
+      // driverXbox.b().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionTwo));
+      //driverXbox.b().onTrue(elevator.driveDown());
+      //driverXbox.b().onFalse(elevator.stop());
 
       // Map the Xbox Left Bumper button to set the Arm to position 0
-      driverXbox.leftBumper().onTrue(arm.setPosition(Constants.ArmConstants.kArmPostionOpen));
+      //driverXbox.leftBumper().onTrue(arm.rotateDown());
+      //driverXbox.leftBumper().onFalse(arm.stop());
 
       // Map the Xbox Right Bumper button to set the Arm to position 1
-      driverXbox.rightBumper().onTrue(arm.setPosition(Constants.ArmConstants.kArmPostionClose));
+      //driverXbox.rightBumper().onTrue(arm.rotateUp());
+      //driverXbox.rightBumper().onFalse(arm.stop());
     }
 
     if (Robot.isSimulation()) {
@@ -186,7 +195,17 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return new ParallelRaceGroup(
+      drivebase.run(()-> {
+        drivebase.setChassisSpeeds(new ChassisSpeeds(1, 0, 0));
+      }),
+      new WaitCommand(3)
+    ).andThen(
+      drivebase.run(()-> {
+        drivebase.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
+      })
+    );
+    //return drivebase.getAutonomousCommand("New Auto");
   }
 
   public void setMotorBrake(boolean brake) {

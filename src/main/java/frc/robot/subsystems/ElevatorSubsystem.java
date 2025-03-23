@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.RobotMath.Elevator;
@@ -41,22 +43,19 @@ import frc.robot.RobotMath.Elevator;
 //import static au.grapplerobotics.interfaces.LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT;
 import static edu.wpi.first.units.Units.*;
 
+import java.util.concurrent.ExecutionException;
+
 public class ElevatorSubsystem extends SubsystemBase {
     //setUp
     private final DCMotor m_elevatorGearbox = DCMotor.getCIM(1);
-    private final SparkMax m_motor = new SparkMax(ElevatorConstants.kElevatorMotorID, SparkLowLevel.MotorType.kBrushed);
+    private SparkMax m_motor = new SparkMax(ElevatorConstants.kElevatorMotorID, SparkLowLevel.MotorType.kBrushed);
     private final SparkMaxSim m_motorSim = new SparkMaxSim(m_motor, m_elevatorGearbox);
-    private final RelativeEncoder m_encoder = m_motor.getEncoder();
-    private final ProfiledPIDController m_controller = new ProfiledPIDController(
+    private final RelativeEncoder m_encoder = m_motor.getEncoder(); // not tracked b/c brushed motor
+    private final PIDController m_controller = new PIDController(
             ElevatorConstants.kElevatorKp,
             ElevatorConstants.kElevatorKi,
-            ElevatorConstants.kElevatorKd,
-            new Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
-    private final ElevatorFeedforward m_feedForward = new ElevatorFeedforward(
-            ElevatorConstants.kElevatorkS,
-            ElevatorConstants.kElevatorkG,
-            ElevatorConstants.kElevatorkV,
-            ElevatorConstants.kElevatorkA);
+            ElevatorConstants.kElevatorKd);
+   
     private ElevatorSim m_elevatorSim = null;
     
     // Sensors
@@ -75,15 +74,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         // Reset controller with initial position
         resetController();
+     
 
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
-            .closedLoopRampRate(ElevatorConstants.kElevatorRampRate).closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .outputRange(-1, 1);
+        //SparkMaxConfig config = new SparkMaxConfig();
+        //config.smartCurrentLimit(ElevatorConstants.kElevatorCurrentLimit)
+          //  .closedLoopRampRate(ElevatorConstants.kElevatorRampRate).closedLoop
+            //.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            //.outputRange(-1, 1);
             //.openLoopRampRate(ElevatorConstants.kElevatorRampRate);
-
-        m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+        //m_motor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 
         if (RobotBase.isSimulation()) {
             m_elevatorSim = new ElevatorSim(m_elevatorGearbox,
@@ -108,8 +107,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
+
     private void resetController() {
-        m_controller.reset(m_encoder.getPosition(), m_encoder.getVelocity());
+       // m_controller.reset(m_encoder.getPosition(), m_encoder.getVelocity());
         SmartDashboard.putString("Reset Controller", "True");
     }
 
@@ -170,30 +170,30 @@ public class ElevatorSubsystem extends SubsystemBase {
         return (m_encoder.getPosition() / ElevatorConstants.kElevatorGearing) * circumference;
     }
 
-    public double getVelocityMetersPerSecond() {
-        return ((m_encoder.getVelocity() / 60) / ElevatorConstants.kElevatorGearing) * circumference;
-    }
+    // public double getVelocityMetersPerSecond() {
+    //     return ((m_encoder.getVelocity() / 60) / ElevatorConstants.kElevatorGearing) * circumference;
+    // }
 
-    public void reachGoal(double goal){
-        double getControllerSetpointVelocity = m_controller.getSetpoint().velocity;
-        double feedForwardCalcWithVelocity = m_feedForward.calculateWithVelocities(
-            getVelocityMetersPerSecond(), 
-            getControllerSetpointVelocity);
-        double getNextOutputOfPID = m_controller.calculate(getPositionMeters(), goal);
+    // public void reachGoal(double goal){
+    //     double getControllerSetpointVelocity = m_controller.getSetpoint().velocity;
+    //     double feedForwardCalcWithVelocity = m_feedForward.calculateWithVelocities(
+    //         getVelocityMetersPerSecond(), 
+    //         getControllerSetpointVelocity);
+    //     double getNextOutputOfPID = m_controller.calculate(getPositionMeters(), goal);
 
-        double voltsOutput = MathUtil.clamp(
-            feedForwardCalcWithVelocity + getNextOutputOfPID, 
-            -7, 
-            7);
-        m_motor.setVoltage(voltsOutput);
-    }
+    //     double voltsOutput = MathUtil.clamp(
+    //         feedForwardCalcWithVelocity + getNextOutputOfPID, 
+    //         -7, 
+    //         7);
+    //     m_motor.setVoltage(voltsOutput);
+    // }
 
     /*
      * Set voltage to a certain amount, our goal and run it for Command-based programming
      */
     public Command setGoal(double goal){
-        return run(() -> {
-            reachGoal(goal);
+        return runOnce(() -> {
+            m_controller.setSetpoint(goal);
             SmartDashboard.putBoolean("Elevator Height Reached", true);
         });
     }
@@ -202,26 +202,45 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Returns a setGoal. Uses a condition of around height to stop
      * Param: height is in meters
      */
-    public Command setElevatorHeight(double height){
-        SmartDashboard.getNumber("Set Elevator Height", height);
-        resetController();
-        return setGoal(height).until(() -> aroundHeight(height));
-    }
+    // public Command setElevatorHeight(double height){
+    //     SmartDashboard.getNumber("Set Elevator Height", height);
+    //     resetController();
+    //     return setGoal(height).until(() -> aroundHeight(height));
+    // }
 
-    public boolean aroundHeight(double height){
-        return aroundHeight(height, ElevatorConstants.kElevatorDefaultTolerance);
-    }
-    public boolean aroundHeight(double height, double tolerance){
-        return MathUtil.isNear(height, getPositionMeters(), tolerance);
-    }
+    // public boolean aroundHeight(double height){
+    //     return aroundHeight(height, ElevatorConstants.kElevatorDefaultTolerance);
+    // }
+    // public boolean aroundHeight(double height, double tolerance){
+    //     return MathUtil.isNear(height, getPositionMeters(), tolerance);
+    // }
 
      /**
      * Stop the control loop and motor output.
      */
-    public void stop() {
-        m_motor.set(0.0);
+    public Command stop() {
+        return runOnce(() -> {
+            m_motor.set(0.0);
+            overridespeed = 0;
+            overridePid = false;
+        });
     }
 
+    public Command driveUp(){
+        return runOnce(() -> {
+            overridespeed = Constants.ElevatorConstants.kMaxVelocity;
+            overridePid = true;
+        });
+    }
+
+    public Command driveDown(){
+        return runOnce(() -> {
+            overridespeed = -Constants.ElevatorConstants.kMaxVelocity/2;
+            overridePid = true;
+        });
+    }
+    private double overridespeed = 0;
+    private boolean overridePid = false;
     /**
      * Update telemetry, including the mechanism visualization.
      */
@@ -230,5 +249,19 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        System.out.println("up: " + topLimitSwitch.get() + " down: " + bottomLimitSwitch.get());
+        double speed = m_controller.calculate(getPositionMeters());
+        if(overridePid){
+            speed = overridespeed;
+        }
+        if(topLimitSwitch.get() && speed >0){
+            speed = 0;
+        }
+
+        if(bottomLimitSwitch.get() && speed < 0){
+            speed = 0;
+        }
+        System.out.println("Speed: " +speed);
+        m_motor.set(speed);
     }
 }
