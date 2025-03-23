@@ -352,7 +352,6 @@ public class SwerveSubsystem extends SubsystemBase
 
   }
 
-
   /**
    * Command to characterize the robot drive motors using SysId
    *
@@ -519,7 +518,6 @@ public class SwerveSubsystem extends SubsystemBase
   {
     swerveDrive.drive(velocity);
   }
-
 
   /**
    * Get the swerve drive kinematics object.

@@ -45,6 +45,7 @@ public class RobotContainer {
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    * Transform Controller inputs into workable Chassis speeds.
+   * Note: Be sure to update controller references if switching to joystick
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream
     .of(drivebase.getSwerveDrive(),
@@ -114,63 +115,68 @@ public class RobotContainer {
    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+    // Configure bindings for controllers: Xbox or joystick    
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
-    Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
-    Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-    if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
-    } 
-    else {      
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-      
-      /* 
-       * Map Xbox buttons 
-       */ 
-      // Map the Xbox back button to reset gyro
-      driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
+    // Different drive orientations
+    //Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+    //Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
+    //Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
 
-      // Map the Xbox start button to reset gripper arm
-      // driverXbox.start().onTrue(new InstantCommand(() -> arm.resetArm()));
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-      // Map the Xbox Y button to ...?
-      // driverXbox.y().onTrue();
+    /* 
+      * Map Xbox buttons 
+    */ 
+    // Map the Xbox back button to reset gyro
+    driverXbox.back().onTrue(new InstantCommand(() -> drivebase.zeroGyro()));
 
-      // Map the Xbox X button to move the elevator to position 0
-      // driverXbox.x().onTrue(elevator.setGoal(0));
+    // Map the Xbox start button to reset gripper arm
+    // driverXbox.start().onTrue(new InstantCommand(() -> arm.resetArm()));
 
-      // Map the Xbox A button to move the elevator to position 1
-      // driverXbox.a().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionOne));
-      // driverXbox.a().onTrue(elevator.driveUp());
-      // driverXbox.a().onFalse(elevator.stop());
+    // Map the Xbox Y button to ...?
+    // driverXbox.y().onTrue();
 
-      // Map the Xbox B button to move the elevator to position 2
-      // driverXbox.b().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionTwo));
-      // driverXbox.b().onTrue(elevator.driveDown());
-      // driverXbox.b().onFalse(elevator.stop());
+    // Map the Xbox X button to move the elevator to position 0
+    // driverXbox.x().onTrue(elevator.setGoal(0));
 
-      // Map the Xbox Left Bumper button to set the Arm to position 0
-      // driverXbox.leftBumper().onTrue(arm.rotateDown());
-      // driverXbox.leftBumper().onFalse(arm.stop());
+    // Map the Xbox A button to move the elevator to position 1
+    // driverXbox.a().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionOne));
+    // driverXbox.a().onTrue(elevator.driveUp());
+    // driverXbox.a().onFalse(elevator.stop());
 
-      // Map the Xbox Right Bumper button to set the Arm to position 1
-      // driverXbox.rightBumper().onTrue(arm.rotateUp());
-      // driverXbox.rightBumper().onFalse(arm.stop());
+    // Map the Xbox B button to move the elevator to position 2
+    // driverXbox.b().onTrue(elevator.setGoal(Constants.ElevatorConstants.kElevatorPostionTwo));
+    // driverXbox.b().onTrue(elevator.driveDown());
+    // driverXbox.b().onFalse(elevator.stop());
 
-      /*
-       * Map Joystick buttons
-       */
-      
-    }
+    // Map the Xbox Left Bumper button to set the Arm to position 0
+    // driverXbox.leftBumper().onTrue(arm.rotateDown());
+    // driverXbox.leftBumper().onFalse(arm.stop());
 
-    if (Robot.isSimulation()) {
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-    }
+    // Map the Xbox Right Bumper button to set the Arm to position 1
+    // driverXbox.rightBumper().onTrue(arm.rotateUp());
+    // driverXbox.rightBumper().onFalse(arm.stop());
+
+    /*
+      * Map Joystick buttons
+    */
+    // joystick bindings go here
+
+    // Simulation commands - keyboard stuff
+    //Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+    //Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+    //Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
+
+    //if (RobotBase.isSimulation()) {
+    //  drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+    //} 
+    //else { // controller bindings can go here (optional) }
+
+    // if (Robot.isSimulation()) {
+    //   driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+    //   driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+    // }
 
     if (DriverStation.isTest()) {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
@@ -201,16 +207,19 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Commands to run in autonomous mode
     return new ParallelRaceGroup(
+      // run these commands in parallel
+      // Move the chassis 1 m/s in the x-axis and 0 in the y-axis
+      // Wait 3 seconds
       drivebase.run(()-> {
         drivebase.setChassisSpeeds(new ChassisSpeeds(1, 0, 0));
       }),
       new WaitCommand(3)
     ).andThen(
+      // When the previous commands are complete, stop the chassis
       drivebase.run(()-> {
         drivebase.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
       })
     );
-    //return drivebase.getAutonomousCommand("New Auto");
   }
 
   public void setMotorBrake(boolean brake) {

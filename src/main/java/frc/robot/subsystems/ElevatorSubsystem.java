@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 // import au.grapplerobotics.LaserCan;
 // import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 // import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
@@ -46,7 +45,7 @@ import static edu.wpi.first.units.Units.*;
 import java.util.concurrent.ExecutionException;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    //setUp
+    // Setup the code for a brushed, CIM motor
     private final DCMotor m_elevatorGearbox = DCMotor.getCIM(1);
     private SparkMax m_motor = new SparkMax(ElevatorConstants.kElevatorMotorID, SparkLowLevel.MotorType.kBrushed);
     private final RelativeEncoder m_encoder = m_motor.getEncoder(); // not tracked b/c brushed motor
@@ -172,7 +171,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     return ((m_encoder.getVelocity() / 60) / ElevatorConstants.kElevatorGearing) * circumference;
     // }
 
-    // public void reachGoal(double goal){
+    // public void reachGoal(double goal) {
     //     double getControllerSetpointVelocity = m_controller.getSetpoint().velocity;
     //     double feedForwardCalcWithVelocity = m_feedForward.calculateWithVelocities(
     //         getVelocityMetersPerSecond(), 
